@@ -31,9 +31,9 @@ public class FormUserDetailsService implements UserDetailsService {
                 throw new UsernameNotFoundException("No user found with username: " + username);
             }
         }
-        List<GrantedAuthority> collect = account.getUserRoles()
+        List<GrantedAuthority> collect = account.getAccountRoles()
                 .stream()
-                .map(userRole -> userRole.getRoleName())
+                .map(accountRole -> accountRole.getRole().getRoleName())
                 .collect(Collectors.toSet())
                 .stream().map(SimpleGrantedAuthority::new).collect(Collectors.toList());
 

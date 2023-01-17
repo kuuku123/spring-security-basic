@@ -2,6 +2,7 @@ package com.example.corespringsecurity.service.impl;
 
 import com.example.corespringsecurity.domain.dto.AccountDto;
 import com.example.corespringsecurity.domain.entity.Account;
+import com.example.corespringsecurity.domain.entity.AccountRole;
 import com.example.corespringsecurity.domain.entity.Role;
 import com.example.corespringsecurity.repository.RoleRepository;
 import com.example.corespringsecurity.repository.UserRepository;
@@ -36,9 +37,13 @@ public class UserServiceImpl implements UserService {
     public void createUser(Account account){
 
         Role role = roleRepository.findByRoleName("ROLE_USER");
-        Set<Role> roles = new HashSet<>();
-        roles.add(role);
-        account.setUserRoles(roles);
+        AccountRole build = AccountRole.builder()
+                .role(role)
+                .account(account)
+                .build();
+        Set<AccountRole> accountRoles = new HashSet<>();
+        accountRoles.add(build);
+        account.setAccountRoles(accountRoles);
         userRepository.save(account);
     }
 
@@ -50,12 +55,16 @@ public class UserServiceImpl implements UserService {
         Account account = modelMapper.map(accountDto, Account.class);
 
         if(accountDto.getRoles() != null){
-            Set<Role> roles = new HashSet<>();
+            Set<AccountRole> accountRoles = new HashSet<>();
             accountDto.getRoles().forEach(role -> {
                 Role r = roleRepository.findByRoleName(role);
-                roles.add(r);
+                AccountRole build = AccountRole.builder()
+                        .account(account)
+                        .role(r)
+                        .build();
+                accountRoles.add(build);
             });
-            account.setUserRoles(roles);
+            account.setAccountRoles(accountRoles);
         }
         account.setPassword(passwordEncoder.encode(accountDto.getPassword()));
         userRepository.save(account);
@@ -69,9 +78,9 @@ public class UserServiceImpl implements UserService {
         ModelMapper modelMapper = new ModelMapper();
         AccountDto accountDto = modelMapper.map(account, AccountDto.class);
 
-        List<String> roles = account.getUserRoles()
+        List<String> roles = account.getAccountRoles()
                 .stream()
-                .map(role -> role.getRoleName())
+                .map(accountRole -> accountRole.getRole().getRoleName())
                 .collect(Collectors.toList());
 
         accountDto.setRoles(roles);

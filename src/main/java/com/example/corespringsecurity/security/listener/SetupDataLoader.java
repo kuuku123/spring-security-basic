@@ -1,8 +1,6 @@
 package com.example.corespringsecurity.security.listener;
 
-import com.example.corespringsecurity.domain.entity.Account;
-import com.example.corespringsecurity.domain.entity.Resources;
-import com.example.corespringsecurity.domain.entity.Role;
+import com.example.corespringsecurity.domain.entity.*;
 import com.example.corespringsecurity.repository.ResourcesRepository;
 import com.example.corespringsecurity.repository.RoleRepository;
 import com.example.corespringsecurity.repository.UserRepository;
@@ -94,14 +92,21 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     public Account createUserIfNotFound(String userName, String password, String email, int age, Set<Role> roleSet) {
 
         Account account = userRepository.findByUsername(userName);
-
+        Set<AccountRole> accountRoles = new HashSet<>();
+        for (Role role : roleSet) {
+            AccountRole build = AccountRole.builder()
+                    .account(account)
+                    .role(role)
+                    .build();
+            accountRoles.add(build);
+        }
         if (account == null) {
             account = Account.builder()
                     .username(userName)
                     .email(email)
                     .age(age)
                     .password(passwordEncoder.encode(password))
-                    .userRoles(roleSet)
+                    .accountRoles(accountRoles)
                     .build();
         }
         return userRepository.save(account);
@@ -110,11 +115,18 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
     @Transactional
     public Resources createResourceIfNotFound(String resourceName, String httpMethod, Set<Role> roleSet, String resourceType) {
         Resources resources = resourcesRepository.findByResourceNameAndHttpMethod(resourceName, httpMethod);
-
+        Set<ResourcesRole> resourcesRoles = new HashSet<>();
+        for (Role role : roleSet) {
+            ResourcesRole build = ResourcesRole.builder()
+                    .resources(resources)
+                    .role(role)
+                    .build();
+            resourcesRoles.add(build);
+        }
         if (resources == null) {
             resources = Resources.builder()
                     .resourceName(resourceName)
-                    .roleSet(roleSet)
+                    .resourcesRoles(resourcesRoles)
                     .httpMethod(httpMethod)
                     .resourceType(resourceType)
                     .orderNum(count.incrementAndGet())
@@ -122,4 +134,6 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         }
         return resourcesRepository.save(resources);
     }
+
+
 }

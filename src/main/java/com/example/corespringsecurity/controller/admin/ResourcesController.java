@@ -3,6 +3,7 @@ package com.example.corespringsecurity.controller.admin;
 
 import com.example.corespringsecurity.domain.dto.ResourcesDto;
 import com.example.corespringsecurity.domain.entity.Resources;
+import com.example.corespringsecurity.domain.entity.ResourcesRole;
 import com.example.corespringsecurity.domain.entity.Role;
 import com.example.corespringsecurity.repository.RoleRepository;
 import com.example.corespringsecurity.service.ResourcesService;
@@ -44,11 +45,15 @@ public class ResourcesController {
 	public String createResources(ResourcesDto resourcesDto) throws Exception {
 
 		ModelMapper modelMapper = new ModelMapper();
-		Role role = roleRepository.findByRoleName(resourcesDto.getRoleName());
-		Set<Role> roles = new HashSet<>();
-		roles.add(role);
 		Resources resources = modelMapper.map(resourcesDto, Resources.class);
-		resources.setRoleSet(roles);
+		Role role = roleRepository.findByRoleName(resourcesDto.getRoleName());
+		Set<ResourcesRole> resourcesRoles = new HashSet<>();
+		ResourcesRole build = ResourcesRole.builder()
+				.resources(resources)
+				.role(role)
+				.build();
+		resourcesRoles.add(build);
+		resources.setResourcesRoles(resourcesRoles);
 
 		resourcesService.createResources(resources);
 
