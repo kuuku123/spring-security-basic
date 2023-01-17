@@ -2,7 +2,7 @@ package com.example.corespringsecurity.security.provider;
 
 import com.example.corespringsecurity.security.common.FormWebAuthenticationDetails;
 import com.example.corespringsecurity.security.service.AccountContext;
-import com.example.corespringsecurity.security.service.CustomUserDetailsService;
+import com.example.corespringsecurity.security.service.FormUserDetailsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.BadCredentialsException;
@@ -12,10 +12,10 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
-public class CustomAuthenticationProvider implements AuthenticationProvider {
+public class FormAuthenticationProvider implements AuthenticationProvider {
 
     @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private FormUserDetailsService userDetailsService;
 
     @Autowired
     private PasswordEncoder passwordEncoder;

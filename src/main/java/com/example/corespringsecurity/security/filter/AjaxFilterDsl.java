@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
-public class MyCustomDsl extends AbstractHttpConfigurer<MyCustomDsl, HttpSecurity> {
+public class AjaxFilterDsl extends AbstractHttpConfigurer<AjaxFilterDsl, HttpSecurity> {
     private boolean flag;
 
     @Override
@@ -27,12 +27,12 @@ public class MyCustomDsl extends AbstractHttpConfigurer<MyCustomDsl, HttpSecurit
         http.addFilterBefore(filter, UsernamePasswordAuthenticationFilter.class);
     }
 
-    public MyCustomDsl flag(boolean value) {
+    public AjaxFilterDsl flag(boolean value) {
         this.flag = value;
         return this;
     }
 
-    public static MyCustomDsl customDsl() {
-        return new MyCustomDsl();
+    public static AjaxFilterDsl customDsl() {
+        return new AjaxFilterDsl();
     }
 }

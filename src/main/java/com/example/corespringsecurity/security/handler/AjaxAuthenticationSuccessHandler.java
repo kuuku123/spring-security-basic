@@ -1,7 +1,5 @@
 package com.example.corespringsecurity.security.handler;
 
-import com.example.corespringsecurity.domain.Account;
-import com.example.corespringsecurity.security.service.AccountContext;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
