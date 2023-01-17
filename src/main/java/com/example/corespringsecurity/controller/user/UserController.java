@@ -16,8 +16,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
 
     @GetMapping("/mypage")
     public String myPage() throws Exception {
@@ -31,12 +29,7 @@ public class UserController {
 
     @PostMapping("/users")
     public String createUser(AccountDto accountDto) {
-
-        ModelMapper modelMapper = new ModelMapper();
-        Account account = modelMapper.map(accountDto, Account.class);
-        account.setPassword( passwordEncoder.encode(account.getPassword()) );
-        userService.createUser( account );
-
+        userService.createUser( accountDto );
         return "redirect:/";
     }
 
