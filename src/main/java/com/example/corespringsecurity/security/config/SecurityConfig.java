@@ -1,11 +1,14 @@
 package com.example.corespringsecurity.security.config;
 
+import com.example.corespringsecurity.repository.ResourcesRepository;
 import com.example.corespringsecurity.security.common.AjaxLoginAuthenticationEntryPoint;
 import com.example.corespringsecurity.security.filter.AjaxFilterDsl;
+import com.example.corespringsecurity.security.filter.CustomFilterSecurityInterceptorDsl;
 import com.example.corespringsecurity.security.handler.AjaxAccessDeniedHandler;
 import com.example.corespringsecurity.security.handler.FormAccessDeniedHandler;
 import com.example.corespringsecurity.security.provider.AjaxAuthenticationProvider;
 import com.example.corespringsecurity.security.provider.FormAuthenticationProvider;
+import com.example.corespringsecurity.service.SecurityResourceService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
@@ -33,6 +36,9 @@ public class SecurityConfig {
     @Autowired
     private AuthenticationDetailsSource authenticationDetailsSource;
 
+    @Autowired
+    private ResourcesRepository resourcesRepository;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return PasswordEncoderFactories.createDelegatingPasswordEncoder();
@@ -52,7 +58,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public FormAuthenticationProvider customAuthenticationProvider() {
+    public FormAuthenticationProvider formAuthenticationProvider() {
         return new FormAuthenticationProvider();
     }
 
@@ -65,7 +71,7 @@ public class SecurityConfig {
     public SecurityFilterChain ajaxSecurityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf().disable();
-        http.apply(AjaxFilterDsl.customDsl());
+        http.apply(new AjaxFilterDsl());
 
         http
                 .antMatcher("/api/**")
@@ -85,10 +91,12 @@ public class SecurityConfig {
                 .authenticationEntryPoint(new AjaxLoginAuthenticationEntryPoint())
                 .accessDeniedHandler(new AjaxAccessDeniedHandler());
 
+
         return http.build();
     }
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
 
         http.csrf().disable();
 
@@ -114,7 +122,9 @@ public class SecurityConfig {
                 .exceptionHandling()
                 .accessDeniedHandler(accessDeniedHandler());
         http
-                .authenticationProvider(customAuthenticationProvider());
+                .authenticationProvider(formAuthenticationProvider());
+
+        http.apply(new CustomFilterSecurityInterceptorDsl(securityResourceService(resourcesRepository)));
 
         return http.build();
     }
@@ -125,6 +135,11 @@ public class SecurityConfig {
         FormAccessDeniedHandler accessDeniedHandler = new FormAccessDeniedHandler();
         accessDeniedHandler.setErrorPage("/denied");
         return accessDeniedHandler;
+    }
+
+    @Bean
+    public SecurityResourceService securityResourceService(ResourcesRepository resourcesRepository) {
+        return new SecurityResourceService(resourcesRepository);
     }
 
 

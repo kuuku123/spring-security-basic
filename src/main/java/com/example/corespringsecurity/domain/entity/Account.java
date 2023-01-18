@@ -18,7 +18,8 @@ public class Account implements Serializable {
 
     @Id
     @GeneratedValue
-    private Long accountId;
+    @Column(name = "account_id")
+    private Long id;
 
     @Column
     private String username;
@@ -32,7 +33,7 @@ public class Account implements Serializable {
     @Column
     private String password;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "account",cascade = CascadeType.ALL)
     private Set<AccountRole> accountRoles = new HashSet<>();
 }
 

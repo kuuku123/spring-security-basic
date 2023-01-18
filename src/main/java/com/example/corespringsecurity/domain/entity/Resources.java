@@ -21,7 +21,7 @@ public class Resources implements Serializable {
 
     @Id
     @GeneratedValue
-    @Column(name = "resource_id")
+    @Column(name = "resources_id")
     private Long id;
 
     @Column(name = "resource_name")
@@ -36,7 +36,7 @@ public class Resources implements Serializable {
     @Column(name = "resource_type")
     private String resourceType;
 
-    @OneToMany(cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "resources",cascade = CascadeType.ALL)
     private Set<ResourcesRole> resourcesRoles = new HashSet<>();
 
 }

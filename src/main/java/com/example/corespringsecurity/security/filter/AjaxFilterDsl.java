@@ -32,7 +32,4 @@ public class AjaxFilterDsl extends AbstractHttpConfigurer<AjaxFilterDsl, HttpSec
         return this;
     }
 
-    public static AjaxFilterDsl customDsl() {
-        return new AjaxFilterDsl();
-    }
 }

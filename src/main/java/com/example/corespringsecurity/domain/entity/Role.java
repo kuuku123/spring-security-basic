@@ -22,7 +22,8 @@ public class Role implements Serializable {
 
     @Id
     @GeneratedValue
-    private Long roleId;
+    @Column(name = "role_id")
+    private Long id;
 
     @Column(name = "role_name")
     private String roleName;
@@ -34,10 +35,10 @@ public class Role implements Serializable {
 //    @OrderBy("ordernum desc")
 //    private Set<Resources> resourcesSet = new LinkedHashSet<>();
 
-    @OneToMany
+    @OneToMany(mappedBy = "role" ,cascade = CascadeType.ALL)
     private Set<ResourcesRole> resourcesRoles = new HashSet<>();
 
-    @OneToMany
+    @OneToMany(mappedBy = "role", cascade = CascadeType.ALL)
     private Set<AccountRole> accountRoles = new HashSet<>();
 
 }
