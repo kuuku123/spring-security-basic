@@ -13,4 +13,6 @@ public interface ResourcesService {
     void createResources(Resources Resources);
 
     void deleteResources(long id);
+
+    void updateResources();
 }

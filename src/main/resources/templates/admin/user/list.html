@@ -32,8 +32,8 @@
 						<td style="text-align: left;" th:text="${account.email}"></td>
 						<td style="text-align: left;" th:text="${account.age}"></td>
 						<td style="text-align: left;">
-							<span th:each="role,iter : ${account.userRoles}">
-								<h6 th:text="${role.roleName}"></h6>
+							<span th:each="accountRole,iter : ${account.accountRoles}">
+								<h6 th:text="${accountRole.role.getRoleName()}"></h6>
 							</span>
 						</td>
 					</tr>

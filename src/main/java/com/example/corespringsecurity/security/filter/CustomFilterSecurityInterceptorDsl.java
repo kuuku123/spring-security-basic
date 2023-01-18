@@ -35,7 +35,7 @@ public class CustomFilterSecurityInterceptorDsl extends AbstractHttpConfigurer<C
         // here we lookup from the ApplicationContext. You can also just create a new instance.
         FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
         filterSecurityInterceptor.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
-        filterSecurityInterceptor.setSecurityMetadataSource(new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject()));
+        filterSecurityInterceptor.setSecurityMetadataSource(new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject(),securityResourceService));
         filterSecurityInterceptor.setAccessDecisionManager(new AffirmativeBased(Arrays.asList(new RoleVoter())));
 
         http.addFilterBefore(filterSecurityInterceptor,FilterSecurityInterceptor.class);

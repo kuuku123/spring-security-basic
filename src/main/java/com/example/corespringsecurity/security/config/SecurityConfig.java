@@ -2,10 +2,12 @@ package com.example.corespringsecurity.security.config;
 
 import com.example.corespringsecurity.repository.ResourcesRepository;
 import com.example.corespringsecurity.security.common.AjaxLoginAuthenticationEntryPoint;
+import com.example.corespringsecurity.security.factory.UrlResourcesMapFactoryBean;
 import com.example.corespringsecurity.security.filter.AjaxFilterDsl;
 import com.example.corespringsecurity.security.filter.CustomFilterSecurityInterceptorDsl;
 import com.example.corespringsecurity.security.handler.AjaxAccessDeniedHandler;
 import com.example.corespringsecurity.security.handler.FormAccessDeniedHandler;
+import com.example.corespringsecurity.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
 import com.example.corespringsecurity.security.provider.AjaxAuthenticationProvider;
 import com.example.corespringsecurity.security.provider.FormAuthenticationProvider;
 import com.example.corespringsecurity.service.SecurityResourceService;
@@ -21,6 +23,7 @@ import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
+import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -124,7 +127,7 @@ public class SecurityConfig {
         http
                 .authenticationProvider(formAuthenticationProvider());
 
-        http.apply(new CustomFilterSecurityInterceptorDsl(securityResourceService(resourcesRepository)));
+        http.apply(customFilterSecurityInterceptorDsl());
 
         return http.build();
     }
@@ -135,6 +138,21 @@ public class SecurityConfig {
         FormAccessDeniedHandler accessDeniedHandler = new FormAccessDeniedHandler();
         accessDeniedHandler.setErrorPage("/denied");
         return accessDeniedHandler;
+    }
+
+    @Bean
+    public CustomFilterSecurityInterceptorDsl customFilterSecurityInterceptorDsl() {
+        return new CustomFilterSecurityInterceptorDsl(securityResourceService(resourcesRepository));
+    }
+
+    @Bean
+    public UrlFilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource() throws Exception {
+        return new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject(),securityResourceService(resourcesRepository));
+    }
+
+    @Bean
+    public UrlResourcesMapFactoryBean urlResourcesMapFactoryBean() {
+        return new UrlResourcesMapFactoryBean(securityResourceService(resourcesRepository));
     }
 
     @Bean

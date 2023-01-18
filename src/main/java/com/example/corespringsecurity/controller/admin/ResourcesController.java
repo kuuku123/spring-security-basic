@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 public class ResourcesController {
@@ -31,6 +32,7 @@ public class ResourcesController {
 
 	@Autowired
 	private RoleService roleService;
+
 
 	@GetMapping(value="/admin/resources")
 	public String getResources(Model model) throws Exception {
@@ -56,6 +58,7 @@ public class ResourcesController {
 		resources.setResourcesRoles(resourcesRoles);
 
 		resourcesService.createResources(resources);
+		resourcesService.updateResources();
 
 		return "redirect:/admin/resources";
 	}
@@ -82,8 +85,7 @@ public class ResourcesController {
         model.addAttribute("roleList", roleList);
 		Resources resources = resourcesService.getResources(Long.valueOf(id));
 
-		ModelMapper modelMapper = new ModelMapper();
-		ResourcesDto resourcesDto = modelMapper.map(resources, ResourcesDto.class);
+		ResourcesDto resourcesDto = getResourcesDto(resources);
 		model.addAttribute("resources", resourcesDto);
 
 		return "admin/resource/detail";
@@ -94,7 +96,24 @@ public class ResourcesController {
 
 		Resources resources = resourcesService.getResources(Long.valueOf(id));
 		resourcesService.deleteResources(Long.valueOf(id));
+		resourcesService.updateResources();
 
 		return "redirect:/admin/resources";
+	}
+
+	private ResourcesDto getResourcesDto(Resources resources) {
+
+		ResourcesDto build = ResourcesDto.builder()
+				.id(String.valueOf(resources.getId()))
+				.resourceName(resources.getResourceName())
+				.httpMethod(resources.getHttpMethod())
+				.orderNum(resources.getOrderNum())
+				.resourceType(resources.getResourceType())
+				.roleName(resources.getResourceName())
+				.roleSet(resources.getResourcesRoles().stream()
+						.map(resourcesRole -> resourcesRole.getRole())
+						.collect(Collectors.toSet()))
+				.build();
+		return build;
 	}
 }
