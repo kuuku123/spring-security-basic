@@ -12,6 +12,7 @@ import org.springframework.security.access.vote.RoleVoter;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
+import org.springframework.security.core.parameters.P;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,7 @@ public class CustomFilterSecurityInterceptorDsl extends AbstractHttpConfigurer<C
     private final SecurityResourceService securityResourceService;
 
     private boolean flag;
+    private String[] permitAllResources = {"/","/login","/user/login/**"};
 
     @Override
     public void init(HttpSecurity http) throws Exception {
@@ -33,7 +35,7 @@ public class CustomFilterSecurityInterceptorDsl extends AbstractHttpConfigurer<C
         ApplicationContext context = http.getSharedObject(ApplicationContext.class);
 
         // here we lookup from the ApplicationContext. You can also just create a new instance.
-        FilterSecurityInterceptor filterSecurityInterceptor = new FilterSecurityInterceptor();
+        FilterSecurityInterceptor filterSecurityInterceptor = new PermitAllFilter(permitAllResources);
         filterSecurityInterceptor.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
         filterSecurityInterceptor.setSecurityMetadataSource(new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject(),securityResourceService));
         filterSecurityInterceptor.setAccessDecisionManager(new AffirmativeBased(Arrays.asList(new RoleVoter())));

@@ -5,6 +5,7 @@ import com.example.corespringsecurity.security.common.AjaxLoginAuthenticationEnt
 import com.example.corespringsecurity.security.factory.UrlResourcesMapFactoryBean;
 import com.example.corespringsecurity.security.filter.AjaxFilterDsl;
 import com.example.corespringsecurity.security.filter.CustomFilterSecurityInterceptorDsl;
+import com.example.corespringsecurity.security.filter.PermitAllFilter;
 import com.example.corespringsecurity.security.handler.AjaxAccessDeniedHandler;
 import com.example.corespringsecurity.security.handler.FormAccessDeniedHandler;
 import com.example.corespringsecurity.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
@@ -24,6 +25,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.FilterInvocationSecurityMetadataSource;
+import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
@@ -41,6 +43,7 @@ public class SecurityConfig {
 
     @Autowired
     private ResourcesRepository resourcesRepository;
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -128,7 +131,6 @@ public class SecurityConfig {
                 .authenticationProvider(formAuthenticationProvider());
 
         http.apply(customFilterSecurityInterceptorDsl());
-
         return http.build();
     }
 
