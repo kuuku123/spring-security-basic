@@ -1,7 +1,8 @@
-package com.example.corespringsecurity.security.listener;
+package com.example.corespringsecurity.security.init;
 
 import com.example.corespringsecurity.domain.entity.*;
 import com.example.corespringsecurity.repository.ResourcesRepository;
+import com.example.corespringsecurity.repository.RoleHierarchyRepository;
 import com.example.corespringsecurity.repository.RoleRepository;
 import com.example.corespringsecurity.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,6 +29,9 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
 
     @Autowired
     private ResourcesRepository resourcesRepository;
+
+    @Autowired
+    private RoleHierarchyRepository roleHierarchyRepository;
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -72,6 +76,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         createResourceIfNotFound("/users/**", "", roles3, "url");
         createUserIfNotFound("user", "1111", "user@gmail.com", 30, roles3);
 
+        createRoleHierarchyIfNotFound(childRole1,managerRole);
+        createRoleHierarchyIfNotFound(managerRole,adminRole);
     }
 
     @Transactional
@@ -135,5 +141,24 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         return resourcesRepository.save(resources);
     }
 
+    @Transactional
+    public void createRoleHierarchyIfNotFound(Role childRole, Role parentRole) {
+        RoleHierarchy roleHierarchy = roleHierarchyRepository.findByChildName(parentRole.getRoleName());
+        if (roleHierarchy == null) {
+            roleHierarchy = RoleHierarchy.builder()
+                    .childName(parentRole.getRoleName())
+                    .build();
+        }
+        RoleHierarchy parentRoleHierarchy = roleHierarchyRepository.save(roleHierarchy);
+
+        roleHierarchy = roleHierarchyRepository.findByChildName(childRole.getRoleName());
+        if (roleHierarchy == null) {
+            roleHierarchy = RoleHierarchy.builder()
+                    .childName(childRole.getRoleName())
+                    .build();
+        }
+        RoleHierarchy childRoleHierarchy = roleHierarchyRepository.save(roleHierarchy);
+        childRoleHierarchy.setParentName(parentRoleHierarchy);
+    }
 
 }

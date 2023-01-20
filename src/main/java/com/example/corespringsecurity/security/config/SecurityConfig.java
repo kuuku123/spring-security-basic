@@ -1,5 +1,6 @@
 package com.example.corespringsecurity.security.config;
 
+import com.example.corespringsecurity.domain.entity.RoleHierarchy;
 import com.example.corespringsecurity.repository.ResourcesRepository;
 import com.example.corespringsecurity.security.common.AjaxLoginAuthenticationEntryPoint;
 import com.example.corespringsecurity.security.factory.UrlResourcesMapFactoryBean;
@@ -16,6 +17,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -58,11 +60,6 @@ public class SecurityConfig {
             web.ignoring().antMatchers("/favicon.ico", "/resources/**", "/error");
         };
     }
-
-
-
-
-
     @Bean
     public FormAuthenticationProvider formAuthenticationProvider() {
         return new FormAuthenticationProvider();
@@ -144,7 +141,7 @@ public class SecurityConfig {
 
     @Bean
     public CustomFilterSecurityInterceptorDsl customFilterSecurityInterceptorDsl() {
-        return new CustomFilterSecurityInterceptorDsl(securityResourceService(resourcesRepository));
+        return new CustomFilterSecurityInterceptorDsl(securityResourceService(resourcesRepository),roleHierarchy());
     }
 
     @Bean
@@ -162,5 +159,9 @@ public class SecurityConfig {
         return new SecurityResourceService(resourcesRepository);
     }
 
-
+    @Bean
+    public RoleHierarchyImpl roleHierarchy() {
+        RoleHierarchyImpl roleHierarchy = new RoleHierarchyImpl();
+        return roleHierarchy;
+    }
 }
