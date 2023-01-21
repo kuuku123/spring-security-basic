@@ -1,10 +1,8 @@
 package com.example.corespringsecurity.security.init;
 
 import com.example.corespringsecurity.domain.entity.*;
-import com.example.corespringsecurity.repository.ResourcesRepository;
-import com.example.corespringsecurity.repository.RoleHierarchyRepository;
-import com.example.corespringsecurity.repository.RoleRepository;
-import com.example.corespringsecurity.repository.UserRepository;
+import com.example.corespringsecurity.repository.*;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
@@ -17,24 +15,22 @@ import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 
 @Component
+@RequiredArgsConstructor
 public class SetupDataLoader implements ApplicationListener<ContextRefreshedEvent> {
 
     private boolean alreadySetup = false;
 
-    @Autowired
-    private UserRepository userRepository;
+    private final UserRepository userRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
+    private final RoleRepository roleRepository;
 
-    @Autowired
-    private ResourcesRepository resourcesRepository;
+    private final ResourcesRepository resourcesRepository;
 
-    @Autowired
-    private RoleHierarchyRepository roleHierarchyRepository;
+    private final RoleHierarchyRepository roleHierarchyRepository;
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
+    private final PasswordEncoder passwordEncoder;
+
+    private final AccessIpRepository accessIpRepository;
 
     private static AtomicInteger count = new AtomicInteger(0);
 
@@ -74,6 +70,8 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         Role childRole1 = createRoleIfNotFound("ROLE_USER", "회원");
         roles3.add(childRole1);
         createResourceIfNotFound("/users/**", "", roles3, "url");
+        createResourceIfNotFound("/mypage/**", "", roles3, "url");
+
         createUserIfNotFound("user", "1111", "user@gmail.com", 30, roles3);
 
         createRoleHierarchyIfNotFound(childRole1,managerRole);
@@ -159,6 +157,16 @@ public class SetupDataLoader implements ApplicationListener<ContextRefreshedEven
         }
         RoleHierarchy childRoleHierarchy = roleHierarchyRepository.save(roleHierarchy);
         childRoleHierarchy.setParentName(parentRoleHierarchy);
+    }
+
+    private void setupAccessIpData() {
+        AccessIp byIpAddress = accessIpRepository.findByIpAddress("0:0:0:0:0:0:0:1");
+        if (byIpAddress == null) {
+            AccessIp accessIp = AccessIp.builder()
+                    .ipAddress("0:0:0:0:0:0:0:1")
+                    .build();
+            accessIpRepository.save(accessIp);
+        }
     }
 
 }

@@ -2,6 +2,7 @@ package com.example.corespringsecurity.security.filter;
 
 import com.example.corespringsecurity.security.factory.UrlResourcesMapFactoryBean;
 import com.example.corespringsecurity.security.metadatasource.UrlFilterInvocationSecurityMetadataSource;
+import com.example.corespringsecurity.security.voter.IpAddressVoter;
 import com.example.corespringsecurity.service.SecurityResourceService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +32,7 @@ public class CustomFilterSecurityInterceptorDsl extends AbstractHttpConfigurer<C
     private final RoleHierarchyImpl roleHierarchy;
 
     private boolean flag;
-    private String[] permitAllResources = {"/","/login","/user/login/**"};
+    private String[] permitAllResources = {"/", "/login", "/user/login/**"};
 
     @Override
     public void init(HttpSecurity http) throws Exception {
@@ -44,10 +45,10 @@ public class CustomFilterSecurityInterceptorDsl extends AbstractHttpConfigurer<C
         // here we lookup from the ApplicationContext. You can also just create a new instance.
         FilterSecurityInterceptor filterSecurityInterceptor = new PermitAllFilter(permitAllResources);
         filterSecurityInterceptor.setAuthenticationManager(http.getSharedObject(AuthenticationManager.class));
-        filterSecurityInterceptor.setSecurityMetadataSource(new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject(),securityResourceService));
+        filterSecurityInterceptor.setSecurityMetadataSource(new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject(), securityResourceService));
         filterSecurityInterceptor.setAccessDecisionManager(new AffirmativeBased(getAccessDecisionVoters()));
 
-        http.addFilterBefore(filterSecurityInterceptor,FilterSecurityInterceptor.class);
+        http.addFilterBefore(filterSecurityInterceptor, FilterSecurityInterceptor.class);
 
     }
 
@@ -64,6 +65,7 @@ public class CustomFilterSecurityInterceptorDsl extends AbstractHttpConfigurer<C
     private List<AccessDecisionVoter<?>> getAccessDecisionVoters() {
 
         List<AccessDecisionVoter<? extends Object>> accessDecisionVoters = new ArrayList<>();
+        accessDecisionVoters.add(new IpAddressVoter(securityResourceService));
         accessDecisionVoters.add(roleVoter());
 
         return accessDecisionVoters;

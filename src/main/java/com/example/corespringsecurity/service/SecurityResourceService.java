@@ -2,11 +2,14 @@ package com.example.corespringsecurity.service;
 
 import com.example.corespringsecurity.domain.entity.Resources;
 import com.example.corespringsecurity.domain.entity.Role;
+import com.example.corespringsecurity.repository.AccessIpRepository;
 import com.example.corespringsecurity.repository.ResourcesRepository;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.access.ConfigAttribute;
 import org.springframework.security.access.SecurityConfig;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.security.web.util.matcher.RequestMatcher;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -14,14 +17,15 @@ import java.io.ObjectInputFilter;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
+@RequiredArgsConstructor
+@Service
 public class SecurityResourceService {
 
-    private ResourcesRepository resourcesRepository;
+    private final ResourcesRepository resourcesRepository;
+    private final AccessIpRepository accessIpRepository;
 
-    public SecurityResourceService(ResourcesRepository resourcesRepository) {
-        this.resourcesRepository = resourcesRepository;
-    }
 
     @Transactional
     public LinkedHashMap<RequestMatcher, List<ConfigAttribute>> getResourceList() {
@@ -37,5 +41,12 @@ public class SecurityResourceService {
             });
         });
         return result;
+    }
+
+    public List<String> getAccessIpList() {
+        List<String> collect = accessIpRepository.findAll().stream()
+                .map(accessIp -> accessIp.getIpAddress())
+                .collect(Collectors.toList());
+        return collect;
     }
 }

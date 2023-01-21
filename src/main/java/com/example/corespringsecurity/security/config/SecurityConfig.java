@@ -13,12 +13,14 @@ import com.example.corespringsecurity.security.metadatasource.UrlFilterInvocatio
 import com.example.corespringsecurity.security.provider.AjaxAuthenticationProvider;
 import com.example.corespringsecurity.security.provider.FormAuthenticationProvider;
 import com.example.corespringsecurity.service.SecurityResourceService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.security.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.authentication.AuthenticationDetailsSource;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
@@ -33,19 +35,16 @@ import org.springframework.security.web.authentication.AuthenticationSuccessHand
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
+@EnableGlobalMethodSecurity(securedEnabled = true,prePostEnabled = true)
 public class SecurityConfig {
-    @Autowired
-    private AuthenticationSuccessHandler authenticationSuccessHandler;
+    private final AuthenticationSuccessHandler authenticationSuccessHandler;
 
-    @Autowired
-    private AuthenticationFailureHandler authenticationFailureHandler;
+    private final AuthenticationFailureHandler authenticationFailureHandler;
 
-    @Autowired
-    private AuthenticationDetailsSource authenticationDetailsSource;
+    private final AuthenticationDetailsSource authenticationDetailsSource;
 
-    @Autowired
-    private ResourcesRepository resourcesRepository;
-
+    private final SecurityResourceService securityResourceService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -141,22 +140,17 @@ public class SecurityConfig {
 
     @Bean
     public CustomFilterSecurityInterceptorDsl customFilterSecurityInterceptorDsl() {
-        return new CustomFilterSecurityInterceptorDsl(securityResourceService(resourcesRepository),roleHierarchy());
+        return new CustomFilterSecurityInterceptorDsl(securityResourceService,roleHierarchy());
     }
 
     @Bean
     public UrlFilterInvocationSecurityMetadataSource urlFilterInvocationSecurityMetadataSource() throws Exception {
-        return new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject(),securityResourceService(resourcesRepository));
+        return new UrlFilterInvocationSecurityMetadataSource(urlResourcesMapFactoryBean().getObject(),securityResourceService);
     }
 
     @Bean
     public UrlResourcesMapFactoryBean urlResourcesMapFactoryBean() {
-        return new UrlResourcesMapFactoryBean(securityResourceService(resourcesRepository));
-    }
-
-    @Bean
-    public SecurityResourceService securityResourceService(ResourcesRepository resourcesRepository) {
-        return new SecurityResourceService(resourcesRepository);
+        return new UrlResourcesMapFactoryBean(securityResourceService);
     }
 
     @Bean
